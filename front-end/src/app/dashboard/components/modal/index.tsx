@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X, Trash } from "lucide-react";
 import { use } from "react";
 import { OrderContext } from "@/providers/order";
 import { calculateTotalOrder } from "@/lib/helper";
@@ -12,16 +12,20 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export function ModalOrder() {
-  const { onRequestClose, order, finishOrder } = use(OrderContext);
+  const { onRequestClose, order, finishOrder, removeOrderItem} = use(OrderContext);
 
   async function handleFinishOrder() {
     if (order.length === 0) return;
     await finishOrder(order[0].order.id);
   }
 
+  function handleRemoveItem(itemId: string) {
+    removeOrderItem(itemId);
+  }
+
   return (
     <AlertDialog open={order.length > 0} onOpenChange={onRequestClose}>
-      <AlertDialogContent className=" text-white max-w-md bg-zinc-800 border border-white/10 shadow-lg">
+      <AlertDialogContent className="text-white max-w-md bg-zinc-800 border border-white/10 shadow-lg">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex justify-between items-center text-xl font-bold">
             Detalhes do pedido
@@ -38,24 +42,29 @@ export function ModalOrder() {
             </h2>
           </div>
         ) : (
-          <div className="">
+          <div>
             <div className="flex items-center gap-2 mb-4">
               <span className="block text-xl">
                 Mesa: {order[0].order.table}
               </span>
-
               {order[0].order?.name && (
-                <span className="block text-xl font-bold bg-stone-700 rounded-md px-2 ">
+                <span className="block text-xl font-bold bg-stone-700 rounded-md px-2">
                   {order[0].order.name}
                 </span>
               )}
             </div>
             {order.map((item) => (
-              <div className="mb-4" key={item.id}>
+              <div className="mb-4 flex justify-between items-center" key={item.id}>
                 <span className="block">
                   Qtd: {item.amount} - {item.product.name} <br /> R${" "}
                   {(parseFloat(item.product.price) * item.amount).toFixed(2)}
                 </span>
+                  <button
+                    onClick={() => handleRemoveItem(item.id)}
+                    className="ml-2 text-red-500 hover:text-red-700"
+                  >
+                    <Trash size={20} />
+                  </button>
               </div>
             ))}
           </div>

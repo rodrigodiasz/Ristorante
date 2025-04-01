@@ -34,6 +34,7 @@ type OrderContextData = {
   onRequestClose: () => void;
   order: OrderItemProps[];
   finishOrder: (order_id: string) => Promise<void>;
+  removeOrderItem: (itemId: string) => Promise<void>;
 };
 
 type OrderProviderProps = {
@@ -98,6 +99,26 @@ export function OrderProvider({ children }: OrderProviderProps) {
     setIsOpen(false);
   }
 
+  async function removeOrderItem(itemId: string) {
+    try {
+      const token = await getCookieClient();
+      await api.delete("/order/remove", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          item_id: itemId,
+        },
+      });
+
+      setOrder(prevOrder => prevOrder.filter(item => item.id !== itemId));
+      toast.success("Item removido com sucesso!");
+    } catch (error) {
+      console.error("Erro ao remover o item:", error);
+      toast.error("Falha ao remover o item!");
+    }
+  }
+
   return (
     <OrderContext.Provider
       value={{
@@ -106,6 +127,7 @@ export function OrderProvider({ children }: OrderProviderProps) {
         onRequestClose,
         finishOrder,
         order,
+        removeOrderItem,
       }}
     >
       {children}
