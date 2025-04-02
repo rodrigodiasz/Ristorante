@@ -5,9 +5,9 @@ interface CategoryRequest {
 }
 
 class CreateCategoryService {
-  async execute({ name }): CategoryRequest {
+  async execute({ name }: CategoryRequest) {
     if (name === "") {
-      throw new Error("Nmae invalid");
+      throw new Error("Name invalid");
     }
 
     const category = await prismaClient.category.create({

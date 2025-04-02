@@ -18,6 +18,19 @@ export default function TableOpen() {
     }
     const token = await getCookieClient();
     try {
+      // Verifica se já existe um pedido (mesa) com o mesmo número
+      const response = await api.get("/orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const orders = response.data;
+      if (orders.some((order: any) => order.table === Number(number))) {
+        toast.error("Mesa já cadastrada");
+        return;
+      }
+
+      // Se não existir, cria o pedido (mesa)
       await api.post(
         "/order",
         {
@@ -31,7 +44,6 @@ export default function TableOpen() {
         }
       );
       toast.success("Mesa aberta com sucesso");
-
       router.push("/dashboard");
     } catch (err) {
       toast.error("Erro ao abrir mesa");
@@ -57,7 +69,11 @@ export default function TableOpen() {
             value={name}
           />
         </div>
-        <Button className="bg-green-400 text-white font-bold hover:bg-green-600" type="button" onClick={openOrder}>
+        <Button
+          className="bg-green-400 text-white font-bold hover:bg-green-600"
+          type="button"
+          onClick={openOrder}
+        >
           Abrir Mesa
         </Button>
       </form>
