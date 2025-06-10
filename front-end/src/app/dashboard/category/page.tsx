@@ -3,6 +3,7 @@ import { getCookieServer } from "@/lib/cookieServer";
 import { redirect } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { TagIcon } from "lucide-react";
 
 export default function Category() {
   async function handleRegisterCategory(formData: FormData) {
@@ -30,27 +31,53 @@ export default function Category() {
         return;
       });
 
-      redirect("/dashboard")
+    redirect("/dashboard");
   }
+
   return (
-    <main className="container mx-auto p-5 w-200">
-      <h1 className="mb-3 text-3xl font-bold">Nova Categoria</h1>
-      <form
-        className="w-full flex flex-col gap-4"
-        action={handleRegisterCategory}
-      >
-        <Input
-          className="bg-zinc-800 px-2 py-1.5 border-1 rounded-md"
-          type="text"
-          name="name"
-          placeholder="Nome da categoria, ex: Pizzas"
-          required
-        />
-        <Button className="bg-green-400 text-white font-bold hover:bg-green-600">
-          Cadastrar
-        </Button>
-        
-      </form>
+    <main className="container mx-auto px-4 py-8 max-w-2xl">
+      <div className="flex flex-col items-center mb-8">
+        <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mb-4">
+          <TagIcon className="w-8 h-8 text-emerald-500" />
+        </div>
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
+          Nova Categoria
+        </h1>
+        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          Adicione uma nova categoria para organizar seus produtos
+        </p>
+      </div>
+
+      <div className="max-w-md mx-auto">
+        <form
+          className="space-y-6 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700"
+          action={handleRegisterCategory}
+        >
+          <div className="space-y-2">
+            <label
+              htmlFor="name"
+              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            >
+              Nome da Categoria
+            </label>
+            <Input
+              id="name"
+              className="w-full dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700"
+              type="text"
+              name="name"
+              placeholder="Ex: Pizzas, Bebidas, Sobremesas..."
+              required
+            />
+          </div>
+
+          <Button
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 transition-colors"
+            type="submit"
+          >
+            Cadastrar Categoria
+          </Button>
+        </form>
+      </div>
     </main>
   );
 }

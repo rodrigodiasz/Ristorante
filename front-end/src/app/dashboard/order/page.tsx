@@ -14,6 +14,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { ShoppingCart, Plus, Trash2 } from "lucide-react";
 
 type CategoryProps = {
   id: string;
@@ -178,122 +179,170 @@ export default function OrderPage() {
   }
 
   return (
-    <main className="container mx-auto p-5 max-w-lg">
-      <h1 className="text-3xl mb-10 text-center">Cadastrar Pedido</h1>
-
-      <form className="flex flex-col gap-4">
-        {/* Mesa */}
-        {orders.length !== 0 && (
-          <Select
-            value={orderSelected?.id}
-            onValueChange={(value) => {
-              const selected = orders.find((order) => order.id === value);
-              setOrderSelected(selected);
-            }}
-          >
-            <SelectTrigger className="w-full bg-dark-900 border border-gray-700">
-              <SelectValue placeholder="Selecione uma mesa" />
-            </SelectTrigger>
-            <SelectContent>
-              {orders.map((order) => (
-                <SelectItem key={order.id} value={order.id}>
-                  Mesa {order.table}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        {/* Categoria */}
-        {category.length !== 0 && (
-          <Select
-            value={categorySelected?.id}
-            onValueChange={(value) => {
-              const selected = category.find((cat) => cat.id === value);
-              setCategorySelected(selected);
-            }}
-          >
-            <SelectTrigger className="w-full border border-gray-700">
-              <SelectValue placeholder="Selecione uma categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              {category.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        {/* Produto */}
-        {products.length !== 0 && (
-          <Select
-            value={productSelected?.id}
-            onValueChange={(value) => {
-              const selected = products.find((prod) => prod.id === value);
-              setProductSelected(selected);
-            }}
-          >
-            <SelectTrigger className="w-full bg-dark-900 border border-gray-700">
-              <SelectValue placeholder="Selecione um produto" />
-            </SelectTrigger>
-            <SelectContent>
-              {products.map((prod) => (
-                <SelectItem key={prod.id} value={prod.id}>
-                  {prod.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        {/* Quantidade */}
-        <div className="flex items-center gap-4">
-          <label className="text-white text-lg">Quantidade:</label>
-          <Input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-50"
-          />
-          <Button className="w-50" onClick={handleAddItem} type="button">
-            Adicionar
-          </Button>
+    <main className="container mx-auto px-4 py-8 max-w-2xl">
+      <div className="flex flex-col items-center mb-8">
+        <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mb-4">
+          <ShoppingCart className="w-8 h-8 text-emerald-500" />
         </div>
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
+          Cadastrar Pedido
+        </h1>
+        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          Selecione a mesa e adicione os itens do pedido
+        </p>
+      </div>
 
-        {/* Botões */}
-        <div className="flex gap-4">
-          <Button
-            className="w-full bg-green-400 text-white font-bold hover:bg-green-600"
-            disabled={items.length === 0}
-            onClick={handleFinishOrder}
-            type="button"
-          >
-            Finalizar Pedido
-          </Button>
-        </div>
-      </form>
+      <div className="space-y-6">
+        <form className="space-y-6 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700">
+          {/* Mesa */}
+          {orders.length !== 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Mesa
+              </label>
+              <Select
+                value={orderSelected?.id}
+                onValueChange={(value) => {
+                  const selected = orders.find((order) => order.id === value);
+                  setOrderSelected(selected);
+                }}
+              >
+                <SelectTrigger className="w-full dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700">
+                  <SelectValue placeholder="Selecione uma mesa" />
+                </SelectTrigger>
+                <SelectContent>
+                  {orders.map((order) => (
+                    <SelectItem key={order.id} value={order.id}>
+                      Mesa {order.table}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
-      {/* Itens adicionados */}
-      <div className="flex flex-col gap-2 mt-6">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="bg-zinc-800 rounded p-3 flex justify-between items-center"
-          >
-            <span>
-              {item.name} - Qtd: {item.amount}
-            </span>
+          {/* Categoria */}
+          {category.length !== 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Categoria
+              </label>
+              <Select
+                value={categorySelected?.id}
+                onValueChange={(value) => {
+                  const selected = category.find((cat) => cat.id === value);
+                  setCategorySelected(selected);
+                }}
+              >
+                <SelectTrigger className="w-full dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {category.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Produto */}
+          {products.length !== 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Produto
+              </label>
+              <Select
+                value={productSelected?.id}
+                onValueChange={(value) => {
+                  const selected = products.find((prod) => prod.id === value);
+                  setProductSelected(selected);
+                }}
+              >
+                <SelectTrigger className="w-full dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700">
+                  <SelectValue placeholder="Selecione um produto" />
+                </SelectTrigger>
+                <SelectContent>
+                  {products.map((prod) => (
+                    <SelectItem key={prod.id} value={prod.id}>
+                      {prod.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Quantidade e Adicionar */}
+          <div className="flex items-end gap-4">
+            <div className="flex-1 space-y-2">
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Quantidade
+              </label>
+              <Input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="w-full dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700"
+                min="1"
+              />
+            </div>
             <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => handleRemoveItem(item.id)}
+              className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-4"
+              onClick={handleAddItem}
+              type="button"
             >
-              Remover
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar
             </Button>
           </div>
-        ))}
+        </form>
+
+        {/* Itens adicionados */}
+        {items.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-medium text-zinc-900 dark:text-white">
+              Itens do Pedido
+            </h2>
+            <div className="space-y-3">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-4 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="text-zinc-900 dark:text-white">
+                      {item.name}
+                    </span>
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                      x{item.amount}
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveItem(item.id)}
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <Button
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 mt-6"
+              disabled={items.length === 0}
+              onClick={handleFinishOrder}
+              type="button"
+            >
+              Finalizar Pedido
+            </Button>
+          </div>
+        )}
       </div>
     </main>
   );

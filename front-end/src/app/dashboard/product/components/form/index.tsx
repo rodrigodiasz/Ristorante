@@ -1,5 +1,5 @@
 "use client";
-import { UploadCloud } from "lucide-react";
+import { UploadCloud, PackageIcon } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 import Image from "next/image";
 import { api } from "@/services/api";
@@ -30,6 +30,7 @@ export function Form({ categories }: Props) {
   const router = useRouter();
   const [image, setImage] = useState<File>();
   const [previewImage, setPreviewImage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   function handleFile(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
@@ -56,6 +57,7 @@ export function Form({ categories }: Props) {
       return;
     }
 
+    setIsLoading(true);
     const data = new FormData();
 
     data.append("name", name);
@@ -66,92 +68,136 @@ export function Form({ categories }: Props) {
 
     const token = await getCookieClient();
 
-    await api
-      .post("/product", data, {
+    try {
+      await api.post("/product", data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.warning("Falha ao cadastrar esse produto!");
-        return;
       });
-
-    toast.success("Produto registrado com sucesso");
-    router.push("/dashboard");
+      toast.success("Produto registrado com sucesso");
+      router.push("/dashboard");
+    } catch (err) {
+      console.log(err);
+      toast.warning("Falha ao cadastrar esse produto!");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <main className="flex flex-col items-center px-4 py-8">
-      <h1 className="mb-5 text-2xl font-bold">Novo Produto</h1>
+    <main className="container mx-auto px-4 py-8 max-w-2xl">
+      <div className="flex flex-col items-center mb-8">
+        <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mb-4">
+          <PackageIcon className="w-8 h-8 text-emerald-500" />
+        </div>
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
+          Novo Produto
+        </h1>
+        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          Adicione um novo produto ao seu cardápio
+        </p>
+      </div>
 
       <form
-        className="flex flex-col rounded-md p-6 w-full gap-5 max-w-md"
+        className="space-y-6 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700"
         action={handleRegisterProduct}
       >
-        <label className="w-[100%] h-[280px] relative flex flex-col border-1 border-gray-10 items-center justify-center rounded-xl cursor-pointer overflow-hidden bg-dark-700 hover:bg-dark-600 transition-colors">
-          <span className="flex items-center justify-center z-10">
-            <UploadCloud size={30} color="#FFF" />
-          </span>
-
-          <input
-            type="file"
-            accept="image/png, image/jpeg"
-            required
-            onChange={handleFile}
-            className="absolute inset-0 opacity-0 cursor-pointer"
-          />
-
-          {previewImage && (
-            <Image
-              src={previewImage}
-              alt="Preview"
-              fill
-              className="object-cover z-0"
-              quality={100}
-              priority
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Imagem do Produto
+          </label>
+          <div className="relative w-full aspect-[4/3] rounded-lg border-2 border-dashed border-zinc-200 dark:border-zinc-700 hover:border-emerald-500 dark:hover:border-emerald-500 transition-colors">
+            <input
+              type="file"
+              accept="image/png, image/jpeg"
+              required
+              onChange={handleFile}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             />
-          )}
-        </label>
 
-        <Select name="category" onValueChange={(value) => console.log(value)}>
-          <SelectTrigger className="bg-dark-900 border-1 border-gray-10">
-            <SelectValue placeholder="Selecione uma categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((category, index) => (
-              <SelectItem key={category.id} value={String(index)}>
-                {category.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            {previewImage ? (
+              <Image
+                src={previewImage}
+                alt="Preview"
+                fill
+                className="object-cover rounded-lg"
+                quality={100}
+                priority
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-zinc-500 dark:text-zinc-400">
+                <UploadCloud size={32} />
+                <span className="text-sm">
+                  Clique para fazer upload da imagem
+                </span>
+                <span className="text-xs">PNG ou JPEG</span>
+              </div>
+            )}
+          </div>
+        </div>
 
-        <Input
-          className="bg-dark-900 rounded-md py-2 px-2 border-1 border-gray-10"
-          type="text"
-          name="name"
-          required
-          placeholder="Nome do produto"
-        />
-        <Input
-          className="bg-dark-900 rounded-md py-2 px-2 border-1 border-gray-10"
-          type="text"
-          name="price"
-          required
-          placeholder="Preco do produto"
-        />
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Categoria
+          </label>
+          <Select name="category" onValueChange={(value) => console.log(value)}>
+            <SelectTrigger className="w-full dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700">
+              <SelectValue placeholder="Selecione uma categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((category, index) => (
+                <SelectItem key={category.id} value={String(index)}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Textarea
-          className="bg-dark-900 rounded-md w-full min-h-[120px] p-5 border-1 border-gray-10"
-          name="description"
-          required
-          placeholder="Descricao do Produto"
-        ></Textarea>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Nome do Produto
+          </label>
+          <Input
+            className="w-full dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700"
+            type="text"
+            name="name"
+            required
+            placeholder="Ex: Pizza Margherita"
+          />
+        </div>
 
-        <Button className="bg-green-400 text-white font-bold hover:bg-green-600">
-          Cadastrar Produto
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Preço
+          </label>
+          <Input
+            className="w-full dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700"
+            type="text"
+            name="price"
+            required
+            placeholder="Ex: 45.90"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Descrição
+          </label>
+          <Textarea
+            className="w-full min-h-[120px] dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700"
+            name="description"
+            required
+            placeholder="Descreva os detalhes do produto..."
+          />
+        </div>
+
+        <Button
+          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 transition-colors"
+          type="submit"
+          disabled={isLoading}
+        >
+          {isLoading ? "Cadastrando..." : "Cadastrar Produto"}
         </Button>
       </form>
     </main>

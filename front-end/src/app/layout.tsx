@@ -15,19 +15,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br" suppressHydrationWarning>
-      <body>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <Toaster
-          position="top-center"
-          toastOption={{
-            style: {
-              backgroundColor: "#f1f1f1",
-              color: "#131313",
-              borderColor: "rgba(255,255,255, 0.5)"
-            },
-          }}
-        />
-        {children}
+      <body className="dark:bg-zinc-900 bg-gray-200">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Toaster
+            position="top-center"
+            toastOption={{
+              style: {
+                backgroundColor: "#f1f1f1",
+                color: "#131313",
+                borderColor: "rgba(255,255,255, 0.5)",
+              },
+            }}
+          />
+          {children}
         </ThemeProvider>
       </body>
     </html>

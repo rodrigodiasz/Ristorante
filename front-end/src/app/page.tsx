@@ -1,19 +1,30 @@
+"use client";
 import Link from "next/link";
 import { api } from "../services/api";
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Home() {
-  async function handleLogin(formData: FormData) {
-    "use server";
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
     const email = formData.get("email");
     const password = formData.get("password");
 
     if (email === "" || password === "") {
+      toast.error("Preencha todos os campos");
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const response = await api.post("/session", {
@@ -22,60 +33,110 @@ export default function Home() {
       });
 
       if (!response.data.token) {
+        toast.error("Erro ao fazer login");
         return;
       }
-      const cookieStore = await cookies();
-      const expressTime = 60 * 60 * 24 * 30 * 1000;
-      cookieStore.set("session", response.data.token, {
-        maxAge: expressTime,
-        path: "/",
-      });
+
+      document.cookie = `session=${response.data.token}; path=/; max-age=${
+        60 * 60 * 24 * 30
+      }`;
+      toast.success("Login realizado com sucesso!");
+      router.push("/dashboard");
     } catch (err) {
       console.log(err);
-      return;
+      toast.error("Erro ao fazer login");
+    } finally {
+      setIsLoading(false);
     }
-
-    redirect("/dashboard");
   }
+
   return (
-    <>
-      <main className="container mx-auto flex items-center justify-center flex-col min-h-screen p-2">
-        <div className="mb-5">
-        <h1 className="text-4xl text-green-500 font-bold">Ris<span className="text-white">tora</span><span className="text-red-500">nte</span></h1>
+    <main className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-900 px-4">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <div className="flex justify-center mb-6">
+            <h1 className="text-4xl font-bold">
+              <span className="text-emerald-500">Ris</span>
+              <span className="text-emerald-500 dark:text-white">tora</span>
+              <span className="text-emerald-500 dark:text-red-500">nte</span>
+            </h1>
+          </div>
+          <div className="flex flex-col items-center">
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
+              Login
+            </h2>
+            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              Entre com suas credenciais para acessar o sistema
+            </p>
+          </div>
         </div>
 
-        <section className="flex flex-col items-center">
+        <div className="mt-8">
           <form
-            className="flex flex-col gap-4 sm:w-150 w-70"
-            action={handleLogin}
+            className="space-y-6 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700"
+            onSubmit={handleLogin}
           >
-            <Input
-              className="bg-dark-900 px-2 py-1.5 border-1 border-gray-10 rounded-md"
-              type="email"
-              placeholder="E-mail"
-              required
-              name="email"
-            />
-            <Input
-              className="bg-dark-900 px-2 py-1.5 border-1 border-gray-10 rounded-md"
-              type="password"
-              placeholder="Senha"
-              required
-              name="password"
-            />
-          <Button className="py-1.5 font-bold text-white bg-green-500 hover:bg-green-700 rounded-md" type="submit">
-            Login
-          </Button>
+            <div className="space-y-2">
+              <label
+                htmlFor="email"
+                className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              >
+                E-mail
+              </label>
+              <Input
+                id="email"
+                className="w-full dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700"
+                type="email"
+                placeholder="Digite seu e-mail"
+                required
+                name="email"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="password"
+                className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              >
+                Senha
+              </label>
+              <Input
+                id="password"
+                className="w-full dark:bg-zinc-800 bg-white text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700"
+                type="password"
+                placeholder="Digite sua senha"
+                required
+                name="password"
+              />
+            </div>
+
+            <Button
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 transition-colors"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Entrando...
+                </>
+              ) : (
+                "Entrar"
+              )}
+            </Button>
           </form>
 
-          <p className="mt-4">
+          <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
             Não possui uma conta?{" "}
-            <Link href="/signup" className="text-green-500 font-bold">
-              Cadastre-se{" "}
+            <Link
+              href="/signup"
+              className="font-medium text-emerald-500 hover:text-emerald-600 transition-colors"
+            >
+              Criar conta
             </Link>
           </p>
-        </section>
-      </main>
-    </>
+        </div>
+      </div>
+    </main>
   );
 }
