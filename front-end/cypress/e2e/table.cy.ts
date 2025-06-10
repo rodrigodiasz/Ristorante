@@ -15,7 +15,7 @@ describe('Cadastro de Pedido', () => {
     cy.contains('Cadastrar Mesa').should('be.visible');
     
     // Continua o fluxo
-    cy.get('input[placeholder="Número"]').type('10');
+    cy.get('input[placeholder="Número"]').type('250');
     cy.get('input[placeholder="Nome"]').type('Cliente Cypress');
     cy.contains('Abrir Mesa').click();
 
