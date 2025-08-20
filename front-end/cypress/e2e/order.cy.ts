@@ -15,8 +15,8 @@ describe("Cadastro de Pedido", () => {
     cy.visit("http://localhost:3000/dashboard/table");
 
     // Preenche dados da mesa
-    cy.get('input[placeholder="Número"]').type("99");
-    cy.get('input[placeholder="Nome"]').type("Mesa Teste");
+    cy.get('input[placeholder="Ex: 1"]').type("390");
+    cy.get('input[placeholder="Ex: João Silva"]').type("Mesa Teste");
     cy.get("button").contains("Abrir Mesa").click();
 
     // Redireciona para dashboard

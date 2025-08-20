@@ -5,13 +5,13 @@ describe('CreateUserService', () => {
 
   test('Deve criar usuário corretamente', async () => {
     const user = await createUserService.execute({
-      name: "Teste Jest 25",
-      email: "jest225@teste.com",
+      name: "Teste Jest 22",
+      email: "jest04@teste.com",
       password: "123456"
     });
 
     expect(user).toHaveProperty('id');
-    expect(user.email).toBe('jest225@teste.com');
+    expect(user.email).toBe('jest04@teste.com');
   });
 });
 
